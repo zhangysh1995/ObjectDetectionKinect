@@ -27,15 +27,13 @@ from recog import recog
 # Instantiate CvBridge
 bridge = CvBridge()
 
-rgb = Image()
-depth = Image()
-
 class ImageHandler():
 	def __init__(self):
 		rospy.init_node('cv_handler')
 		atexit.register(self.shutdown)
 		self.rgbSub, self.depthSub = self.initImageTopics()
 		self.dist = 0
+		self.cv2_img = cv2.imread("test_img.jpg")
 		
 	def main(self):
 		moveControl = GoForward()
@@ -46,6 +44,7 @@ class ImageHandler():
 			#		if depth <= 0.5: rospy.loginfo(rospy.get_caller_id() + "...Approached object at 0.5m far ways...")
 			# else: moveControl.moveForward(0.08, 2)
 			moveControl.moveForward(0.08, 2)
+			self.rgb_exists()
 			#do whatever with image
 			time.sleep(2) # fake demo
 	
@@ -68,25 +67,23 @@ class ImageHandler():
 	def image_callback(self, msg):
 		#rospy.loginfo(rospy.get_caller_id() + " Received an image!")
 		try:
-			rgb = msg
-			#cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
+			self.cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
 		except CvBridgeError as e:
 			print(e)
-		else:
-			cv2.imwrite('camera_image.jpeg', cv2_img)
+		#else:
+			#cv2.imwrite('camera_image.jpeg', cv2_img)
 
 	def rgb_exists(self):
 		try:
-			cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
+			cv2.imwrite('rgb.jpeg', self.cv2_img)
 		except CvBridgeError as e:
 			print(e)
 		else:
 			target = "target2.jpg"
-			cv2.imwrite('rgb.jpeg', cv2_img)
 
-			test = cv2.imread("rgb.jpg")
+			test = cv2.imread("rgb.jpeg")
 			rg = recog(test, target)
-			print(rg.if_exist())
+			rospy.loginfo(rospy.get_caller_id() + ": " + rg.if_exist())
 
 	def imageDepth_callback(self, data):
 		depth = data
