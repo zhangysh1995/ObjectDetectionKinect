@@ -22,6 +22,7 @@ import time
 import atexit
 import os
 from goForward import GoForward
+from recog import recog
 
 # Instantiate CvBridge
 bridge = CvBridge()
@@ -68,12 +69,25 @@ class ImageHandler():
 		#rospy.loginfo(rospy.get_caller_id() + " Received an image!")
 		try:
 			rgb = msg
-			cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
+			#cv2_img = bridge.imgmsg_to_cv2(msg, "bgr8")
 		except CvBridgeError as e:
 			print(e)
 		else:
 			cv2.imwrite('camera_image.jpeg', cv2_img)
-	
+
+	def rgb_exists(self):
+		try:
+			cv2_img = bridge.imgmsg_to_cv2(rgb, "bgr8")
+		except CvBridgeError as e:
+			print(e)
+		else:
+			target = "target2.jpg"
+			cv2.imwrite('rgb.jpeg', cv2_img)
+
+			test = cv2.imread("rgb.jpg")
+			rg = recog(test, target)
+			print(rg.if_exist())
+
 	def imageDepth_callback(self, data):
 		depth = data
 		#rospy.loginfo(" Received depth info!")

@@ -5,9 +5,9 @@ from sift2 import sift_match
 
 
 class recog(object):
-    def __init__(self, img):
+    def __init__(self, img, target):
         self.ori = img
-        self.target = cv2.imread('target.jpg')
+        self.target = cv2.imread(target)
         self.res = None
         self.rate = None
         self.box = None
